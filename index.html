@@ -70,6 +70,20 @@ details summary{cursor:pointer;color:var(--g)}
 .rc canvas{background:#fff;border-radius:4px;max-width:60px}
 .rc small{font-size:.62rem;color:var(--dim)}
 .rc select{padding:4px;max-width:72px}
+
+.verdict{display:flex;gap:14px;align-items:center;padding:10px 14px;margin-top:8px}
+.verdict .act{font-size:clamp(1.9rem,8.5vw,3rem);flex:0 0 auto}
+.verdict .why{margin:0;font-size:.78rem;line-height:1.35;flex:1;min-width:0}
+.pad{margin-top:10px}
+.pad .pb{padding:12px 2px;font-size:1.05rem}
+.pb.alt{outline:2px dashed var(--c);outline-offset:-2px}
+.pad.has .pb.alt{opacity:.65}
+.hudbadge{position:absolute;left:8px;top:8px;z-index:3;min-width:72px;max-width:30%;padding:5px 10px;border-radius:10px;border:2px solid var(--c,var(--line));background:rgba(0,0,0,.78);color:var(--c,var(--dim));font-weight:800;font-size:clamp(1rem,5.2vw,1.6rem);line-height:1.1;letter-spacing:.04em;text-align:center;text-shadow:0 0 12px currentColor;pointer-events:none;display:none}
+.hudbadge small{display:block;font-size:.55rem;font-weight:400;color:var(--ink);letter-spacing:.04em;text-shadow:none}
+.hudbadge.show{display:block}
+.hudbadge.HIT{--c:var(--hit)}.hudbadge.STAND{--c:var(--stand)}.hudbadge.DOUBLE{--c:var(--dbl)}.hudbadge.SPLIT{--c:var(--split)}
+.rc canvas{max-width:64px}
+@media(max-width:600px){body{padding:10px}h1{font-size:1.3rem;letter-spacing:.22em;margin:0}.sub{font-size:.6rem;margin:0 0 8px;letter-spacing:.08em}.panel{padding:10px}.video{aspect-ratio:4/3;max-height:42vh}}
 </style>
 </head>
 <body>
@@ -83,7 +97,17 @@ details summary{cursor:pointer;color:var(--g)}
     <video id="vid" autoplay muted playsinline></video>
     <div class="guide" id="guide" aria-hidden="true"><div class="zone" id="zD">Dealer cards here</div><div class="zone" id="zP">Your cards here</div></div>
     <div class="ph" id="ph">Share your Rainbet window (or use your camera) to keep the table in view beside the advice.</div>
+    <div class="hudbadge" id="hudb" aria-hidden="true"></div>
   </div>
+  <p class="note" id="reading" style="margin:8px 0 0">Auto-read is waiting for your game preview.</p>
+  <p class="note" id="szwarn" style="margin:2px 0 0;color:var(--hit)"></p>
+  <div class="verdict" id="verdict" aria-live="polite">
+    <div class="act" id="act">–</div>
+    <p class="why" id="why">Enter the dealer’s up card and your cards to get a move.</p>
+  </div>
+  <div class="pad" id="pad" aria-label="What to tap on Rainbet"><div class="pb" data-a="DOUBLE">x2<small>Double</small></div><div class="pb" data-a="HIT">Hit<small>Hit</small></div><div class="pb" data-a="STAND">Stand<small>Stand</small></div><div class="pb" data-a="SPLIT">Split<small>Split</small></div></div>
+  <div class="lbl">What the reader sees. Wrong card? Pick the right one once and it learns.</div>
+  <div class="rvbox" id="rv"></div>
   <div class="row">
     <button id="bScreen">Preview game (screen share)</button>
     <button id="bCam">Use camera</button>
@@ -112,12 +136,6 @@ details summary{cursor:pointer;color:var(--g)}
 </section>
 
 <section class="panel" aria-label="Advice">
-  <p class="note" id="reading" style="margin:0 0 8px">Auto-read is waiting for your game preview.</p>
-  <div class="verdict" id="verdict" aria-live="polite">
-    <div class="act" id="act">–</div>
-    <p class="why" id="why">Enter the dealer’s up card and your cards to get a move.</p>
-  </div>
-  <div class="pad" id="pad" aria-label="What to tap on Rainbet"><div class="pb" data-a="DOUBLE">x2<small>Double</small></div><div class="pb" data-a="HIT">Hit<small>Hit</small></div><div class="pb" data-a="STAND">Stand<small>Stand</small></div><div class="pb" data-a="SPLIT">Split<small>Split</small></div></div>
   <div class="odds" id="odds"></div>
 
   <div class="lbl">Dealer shows</div>
@@ -125,8 +143,6 @@ details summary{cursor:pointer;color:var(--g)}
   <div class="lbl">Your hand</div>
   <div class="hand" id="mHand"></div>
 
-  <div class="lbl">What the reader sees. Fix any wrong card here.</div>
-  <div class="rvbox" id="rv"></div>
   <details style="margin-top:12px"><summary>Manual backup (tap cards)</summary>
   <div class="lbl">Who gets the card? Then tap it.</div>
   <div class="row" style="margin-top:0" id="targets">
@@ -154,7 +170,7 @@ details summary{cursor:pointer;color:var(--g)}
 </section>
 </div>
 
-<p class="note"><b>Honest odds:</b> no system can always beat the dealer. The best possible play, which this uses, cuts the house edge to about 0.5%, so you still lose many hands and sessions. Rainbet’s Blackjack pays 3:2 on blackjack and 2:1 on insurance (confirmed on its rules page), which this matches. Rainbet doesn’t publish the dealer’s soft 17 rule or split limits, so this assumes the dealer stands on soft 17 and doubling after split is allowed. Only bet what you can afford to lose. <b>Auto-read needs a computer</b> (or a second device pointed at the game): phones can’t share another app’s screen into a web page. After a split, switch to the manual backup.</p>
+<p class="note"><b>Honest odds:</b> no system can always beat the dealer. The best possible play, which this uses, cuts the house edge to about 0.5%, so you still lose many hands and sessions. Rainbet’s Blackjack pays 3:2 on blackjack and 2:1 on insurance (confirmed on its rules page), which this matches. Rainbet doesn’t publish the dealer’s soft 17 rule or split limits, so this assumes the dealer stands on soft 17 and doubling after split is allowed. Only bet what you can afford to lose. <b>Auto-read:</b> on a phone, point the camera at the game on another screen (phones can’t share another app’s screen into a web page). Fill the preview with the game, hold steady, avoid glare. After a split, switch to the manual backup.</p>
 
 <script>
 const R=['A','2','3','4','5','6','7','8','9','10'];
@@ -192,20 +208,20 @@ function odds(h,up){
   let w=0,pu=0,l=0;d.forEach((p,i)=>{const dt=i===5?0:17+i;if(i===5||t>dt)w+=p;else if(t===dt)pu+=p;else l+=p});
   return{stand,hit,dbl,w,pu,l,bust:d[5]}}
 
-function advise(h,d){
+function advise(h,d,nosplit){
   const dv=val(d),weak=dv>=2&&dv<=6,two=h.length===2;
   const {t,soft}=tot(h);
   const dw=weak?`The dealer’s ${d} is weak: they bust about 35–42% of the time.`:`The dealer’s ${d} is strong: they rarely bust.`;
   const A=(act,why)=>({act,why});
-  const dbl=(c,why,fb,fwhy)=>(two&&c)?A('DOUBLE',why):A(fb,fwhy||why);
-  if(t>21)return A('BUST','Over 21. Start a new hand.');
+  const dbl=(c,why,fb,fwhy)=>(two&&c)?{...A('DOUBLE',why),alt:fb}:A(fb,fwhy||why);
+  if(t>21)return null;
   if(t===21)return A('STAND',two?'Blackjack! Nothing beats it. Stand.':'21 is the best total possible. Stand.');
-  if(two&&h[0]===h[1]){
+  if(!nosplit&&two&&h[0]===h[1]){
     const r=h[0];
     const sp={'A':1,'8':1,'9':[2,3,4,5,6,8,9].includes(dv),'7':dv<=7,'6':dv>=2&&dv<=6,'4':dv===5||dv===6,'3':dv<=7,'2':dv<=7}[r];
     if(sp){
       const w={'A':'Each ace alone starts a strong 11. Always split.','8':'16 is the worst hand in the game. Two hands starting at 8 are much better. Always split.'}[r];
-      return A('SPLIT',w||`Splitting ${r}s turns one mediocre hand into two better ones. ${dw}`);
+      return {...A('SPLIT',w||`Splitting ${r}s turns one mediocre hand into two better ones. ${dw}`),alt:advise(h,d,true).act};
     }
   }
   if(soft){
@@ -224,8 +240,8 @@ function advise(h,d){
   if(t===9)return dbl(dv>=3&&dv<=6,`9 against a weak dealer ${d}: you’re likely to land a strong total. Double.`,'HIT','9 is too low to stand. Hit.');
   if(t===10)return dbl(dv<=9,`10 makes 20 on any ten-value card, and the dealer’s ${d} is beatable. Double.`,'HIT','The dealer’s card is too strong to risk more money. Just hit.');
   if(t===11)return dbl(dv<=10,`11 is your best starting total: any ten gives 21. Double.`,'HIT','Dealer shows an ace, so hit rather than double.');
-  if(t===12)return weak&&dv>=4?A('STAND',`12 busts on a ten, but ${dw} Let them bust.`):A('HIT',`12 against a dealer ${d}: waiting loses more often than the bust risk costs. Hit.`);
-  if(t<=16)return weak?A('STAND',`${t} is poor, but ${dw} Let them bust.`):A('HIT',`${t} loses to a strong dealer ${d} if you stand. Hit and accept the bust risk.`);
+  if(t===12)return weak&&dv>=4?A('STAND',`12 busts on a ten, but ${dw[0].toLowerCase()+dw.slice(1)} Let them bust.`):A('HIT',`12 against a dealer ${d}: waiting loses more often than the bust risk costs. Hit.`);
+  if(t<=16)return weak?A('STAND',`${t} is poor, but ${dw[0].toLowerCase()+dw.slice(1)} Let them bust.`):A('HIT',`${t} loses to a strong dealer ${d} if you stand. Hit and accept the bust risk.`);
   return A('STAND',`${t} is strong enough that hitting risks too much. Stand.`);
 }
 
@@ -238,23 +254,24 @@ const pct=x=>Math.round(x*100)+'%',ev=x=>(x>=0?'+':'')+x.toFixed(2);
 function chips(el,arr){el.innerHTML=arr.length?arr.map(c=>`<span class="chip">${c}</span>`).join(''):'<span class="note">none yet</span>'}
 function render(){
   chips($('dHand'),dealer?[dealer]:[]);chips($('mHand'),me);
-  const a=$('act'),w=$('why'),o=$('odds');
-  if(dealer&&me.length>=2){
-    const r=advise(me,dealer),{t,soft}=tot(me);
-    a.textContent=r.act;a.className='act '+r.act;setPad(r.act);
-    w.textContent=`(${soft?'soft ':''}${t} vs dealer ${dealer}) `+r.why+(dealer==='A'?' Insurance: decline it. It pays 2:1, but the hidden card is a ten only about 31% of the time, so it loses money long term.':'');
-    if(t<=21){
-      const x=odds(me,dealer),two=me.length===2;
-      const best=Math.max(x.stand,x.hit,two?x.dbl:-9);
-      const cell=(n,v,av)=>`<div class="${av&&v===best?'best':''}">${n}<b>${ev(v)}</b></div>`;
-      o.innerHTML=cell('Stand',x.stand,1)+cell('Hit',x.hit,1)+(two?cell('Double',x.dbl,1):'<div>Double<b>n/a</b></div>')
-        +`<div>If you stand: win<b>${pct(x.w)}</b></div><div>Push<b>${pct(x.pu)}</b></div><div>Dealer busts<b>${pct(x.bust)}</b></div>`;
-    }else o.innerHTML='';
+  const a=$('act'),w=$('why'),o=$('odds'),hb=$('hudb');
+  const r=(dealer&&me.length>=2)?advise(me,dealer):null;
+  if(r){
+    const {t,soft}=tot(me),nm={DOUBLE:'x2',HIT:'HIT',STAND:'STAND',SPLIT:'SPLIT'};
+    a.textContent=r.act;a.className='act '+r.act;setPad(r.act,r.alt);
+    hb.className='hudbadge show '+r.act;hb.innerHTML=nm[r.act]+`<small>${soft?'soft ':''}${t} vs ${dealer}</small>`;
+    const altTxt=r.alt?` If ${r.act==='DOUBLE'?'x2':'Split'} isn’t offered: ${r.alt}.`:'';
+    w.textContent=`(${soft?'soft ':''}${t} vs dealer ${dealer}) `+r.why+altTxt+(dealer==='A'?' Insurance: decline it. It pays 2:1, but the hidden card is a ten only about 31% of the time, so it loses money long term.':'');
+    const x=odds(me,dealer),two=me.length===2;
+    const best=Math.max(x.stand,x.hit,two?x.dbl:-9);
+    const cell=(n,v,av)=>`<div class="${av&&v===best?'best':''}">${n}<b>${ev(v)}</b></div>`;
+    o.innerHTML=cell('Stand',x.stand,1)+cell('Hit',x.hit,1)+(two?cell('Double',x.dbl,1):'<div>Double<b>n/a</b></div>')
+      +`<div>If you stand: win<b>${pct(x.w)}</b></div><div>Push<b>${pct(x.pu)}</b></div><div>Dealer busts<b>${pct(x.bust)}</b></div>`;
     const key=r.act+t+dealer+me.length;
-    if(key!==lastSpoken){lastSpoken=key;speak(r.act==='BUST'?'Bust.':`${r.act.toLowerCase()}. ${t} against ${dealer}.`)}
+    if(key!==lastSpoken){lastSpoken=key;speak(`${r.act.toLowerCase()}. ${t} against ${dealer}.`)}
   }else{
-    a.textContent='–';a.className='act';o.innerHTML='';lastSpoken='';setPad(null);
-    w.textContent=!dealer?'Enter the dealer’s up card first.':'Add your two cards.';
+    a.textContent='–';a.className='act';o.innerHTML='';lastSpoken='';setPad(null);hb.className='hudbadge';
+    w.textContent=!dealer?'Enter the dealer’s up card first.':me.length<2?'Add your two cards.':'That total is over 21, so the hand is over (or a card was misread). Fix a card in the list below if needed.';
   }
   const d=+$('decks').value,tc=run/d;
   $('count').textContent=`Running ${run>0?'+':''}${run} · True ${tc>0?'+':''}${tc.toFixed(1)}`+(tc>=2?' · Count favors you':' · Count is neutral or against you');
@@ -317,31 +334,34 @@ let ov={},rvKey='',prevCnt=0,settled=false,auto=false,worker=null,busy=false,tim
 const cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true});
 const rdg=m=>{$('reading').textContent=m};
 function updAuto(){$('bAuto').textContent='Auto-read: '+(auto?'on':'off');$('bAuto').classList.toggle('on',auto);$('bAuto').setAttribute('aria-pressed',auto)}
-async function getWorker(){
-  if(worker)return worker;
-  if(!window.Tesseract)throw new Error('no reader');
-  const w=await Tesseract.createWorker('eng');
-  await w.setParameters({tessedit_char_whitelist:'A23456789JQK10',tessedit_pageseg_mode:'7'});
-  return worker=w}
-async function startAuto(){
+let workerP=null;
+function getWorker(){
+  if(workerP)return workerP;
+  workerP=(async()=>{
+    if(!window.Tesseract)throw new Error('no ocr');
+    const w=await Tesseract.createWorker('eng');
+    await w.setParameters({tessedit_char_whitelist:'A23456789JQK10',tessedit_pageseg_mode:'8'});
+    worker=w;return w})();
+  workerP.catch(()=>{workerP=null});
+  return workerP}
+function startAuto(){
   auto=true;updAuto();
   if(!stream&&!vid.srcObject){rdg('Start the screen share or camera first.');return}
-  rdg('Loading the card reader… (first time takes a few seconds)');
-  try{await getWorker()}catch(e){auto=false;updAuto();rdg('Card reader couldn’t load (needs internet). Use the manual backup below.');return}
-  rdg('Reading the table…');lastSig='';cnt=0;
-  if(!timer)timer=setInterval(scan,700)}
+  buildTpl();lastSig='';cnt=0;rdg('Reading the table…');
+  if(!timer)timer=setInterval(scan,450);
+  getWorker().catch(()=>{})}
 function stopAuto(){auto=false;updAuto();clearInterval(timer);timer=null;rdg('Auto-read is off. Using manual taps.')}
 $('bAuto').onclick=()=>auto?stopAuto():startAuto();
 
 function findCards(){
   const vw=vid.videoWidth,vh=vid.videoHeight;if(!vw)return null;
-  const sc=Math.min(1,640/vw),W=Math.round(vw*sc),H=Math.round(vh*sc),N=W*H;
+  const sc=Math.min(1,800/vw),W=Math.round(vw*sc),H=Math.round(vh*sc),N=W*H;
   cv.width=W;cv.height=H;cx.filter=filt();cx.drawImage(vid,0,0,W,H);cx.filter='none';
   const d=cx.getImageData(0,0,W,H).data,lum=new Uint8Array(N),hist=new Uint32Array(256);
   for(let i=0,j=0;i<N;i++,j+=4){const l=(d[j]*3+d[j+1]*6+d[j+2])/10|0;lum[i]=l;hist[l]++}
   let acc=0,top=255;for(let v=0;v<256;v++){acc+=hist[v];if(acc>=N*0.995){top=v;break}}
-  const thr=Math.max(140,top*0.85),mask=new Uint8Array(N);
-  for(let i=0,j=0;i<N;i++,j+=4){if(lum[i]>=thr&&Math.max(d[j],d[j+1],d[j+2])-Math.min(d[j],d[j+1],d[j+2])<60)mask[i]=1}
+  const thr=Math.max(95,top*0.82),mask=new Uint8Array(N);
+  for(let i=0,j=0;i<N;i++,j+=4){if(lum[i]>=thr&&Math.max(d[j],d[j+1],d[j+2])-Math.min(d[j],d[j+1],d[j+2])<75)mask[i]=1}
   const boxes=[],st=[];
   for(let i=0;i<N;i++){
     if(mask[i]!==1)continue;
@@ -355,7 +375,7 @@ function findCards(){
       if(y<H-1&&mask[q+W]===1){mask[q+W]=2;st.push(q+W)}
     }
     const w=x1-x0+1,h=y1-y0+1;
-    if(a<250||h<H*0.06||a/(w*h)<0.65)continue;
+    if(a<150||h<H*0.045||a/(w*h)<0.58)continue;
     const n=Math.max(1,Math.round(w*1.5/h)),cw=w/n,r=h/cw;
     if(r<1.15||r>1.85)continue;
     for(let k=0;k<n;k++)boxes.push({x:x0+k*cw,y:y0,w:cw,h})
@@ -372,30 +392,119 @@ function parseRank(t){
   if(t.includes('10')||t==='1'||t==='0'||t==='I')return'10';
   const m=t.match(/[AJQK2-9]/);if(!m)return null;
   return 'JQK'.includes(m[0])?'10':m[0]}
-async function readRank(b,sc){
+
+// ----- Glyph reader: isolates the rank, matches it against font templates, OCR only breaks ties, and learns from your fixes -----
+const GW=20,GH=28;
+function otsu(g,n){
+  const h=new Uint32Array(256);for(let i=0;i<n;i++)h[g[i]]++;
+  let sum=0;for(let i=0;i<256;i++)sum+=i*h[i];
+  let sB=0,wB=0,mx=0,th=127;
+  for(let t=0;t<256;t++){wB+=h[t];if(!wB)continue;const wF=n-wB;if(!wF)break;sB+=t*h[t];const mB=sB/wB,mF=(sum-sB)/wF,v=wB*wF*(mB-mF)*(mB-mF);if(v>mx){mx=v;th=t}}
+  return th}
+function resample(mask,bw,bh){
+  const v=new Float32Array(GW*GH);
+  for(let j=0;j<GH;j++){const y0=j*bh/GH,y1=(j+1)*bh/GH;
+    for(let u=0;u<GW;u++){const x0=u*bw/GW,x1=(u+1)*bw/GW;let s=0,ws=0;
+      for(let y=Math.floor(y0);y<Math.ceil(y1)&&y<bh;y++){const wy=Math.min(y+1,y1)-Math.max(y,y0);
+        for(let x=Math.floor(x0);x<Math.ceil(x1)&&x<bw;x++){const wx=Math.min(x+1,x1)-Math.max(x,x0),w=wx*wy;s+=w*mask[y*bw+x];ws+=w}}
+      v[j*GW+u]=ws?s/ws:0}}
+  return v}
+function blur3(v){
+  const o=new Float32Array(v.length);
+  for(let y=0;y<GH;y++)for(let x=0;x<GW;x++){let s=0,n=0;
+    for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const xx=x+dx,yy=y+dy;if(xx<0||yy<0||xx>=GW||yy>=GH)continue;const w=(dx&&dy)?1:(dx||dy)?2:4;s+=w*v[yy*GW+xx];n+=w}
+    o[y*GW+x]=s/n}
+  return o}
+function norm(v){let m=0;for(let i=0;i<v.length;i++)m+=v[i];m/=v.length;const o=new Float32Array(v.length);let s=0;for(let i=0;i<v.length;i++){o[i]=v[i]-m;s+=o[i]*o[i]}s=Math.sqrt(s)||1;for(let i=0;i<o.length;i++)o[i]/=s;return o}
+const dot=(a,b)=>{let s=0;for(let i=0;i<a.length;i++)s+=a[i]*b[i];return s};
+
+// Finds the rank glyph in a crop of the top part of a card. Returns normalised shape + a clean image for OCR.
+function glyphFrom(cv){
+  const W=cv.width,H=cv.height,N=W*H;
+  const d=cv.getContext('2d',{willReadFrequently:true}).getImageData(0,0,W,H).data,g=new Uint8Array(N);
+  for(let i=0,j=0;i<N;i++,j+=4)g[i]=Math.min(d[j],d[j+1],d[j+2]);
+  const th=otsu(g,N);
+  let sB=0,nB=0,sF=0,nF=0;for(let i=0;i<N;i++){if(g[i]<=th){sB+=g[i];nB++}else{sF+=g[i];nF++}}
+  if(!nB||!nF||sF/nF-sB/nB<7||nB<N*0.004||nB>N*0.35)return null;
+  const ink=new Uint8Array(N);for(let i=0;i<N;i++)ink[i]=g[i]<=th?1:0;
+  const lab=new Int32Array(N),comps=[],st=[];let id=0;
+  for(let s0=0;s0<N;s0++){
+    if(!ink[s0]||lab[s0])continue;
+    id++;let x0=W,y0=H,x1=0,y1=0,a=0;st.push(s0);lab[s0]=id;
+    while(st.length){const q=st.pop(),x=q%W,y=(q/W)|0;a++;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;
+      for(let dy=-1;dy<=1;dy++){const yy=y+dy;if(yy<0||yy>=H)continue;for(let dx=-1;dx<=1;dx++){const xx=x+dx;if(xx<0||xx>=W)continue;const p=yy*W+xx;if(ink[p]&&!lab[p]){lab[p]=id;st.push(p)}}}}
+    comps.push({id,x0,y0,x1,y1,a,w:x1-x0+1,h:y1-y0+1,touch:x0===0||y0===0||x1===W-1||y1===H-1})}
+  const ok=c=>c.h>=H*0.12&&c.a>=6;
+  let cand=comps.filter(c=>!c.touch&&ok(c));if(!cand.length)cand=comps.filter(ok);if(!cand.length)return null;
+  const hm=Math.max(...cand.map(c=>c.h)),an=cand.filter(c=>c.h>=hm*0.45).sort((a,b)=>a.y0-b.y0)[0];
+  const grp=cand.filter(c=>c===an||(Math.min(c.y1,an.y1)-Math.max(c.y0,an.y0)>0.5*Math.min(c.h,an.h)&&Math.abs((c.x0+c.x1)/2-(an.x0+an.x1)/2)<an.h*1.3));
+  const gx0=Math.min(...grp.map(c=>c.x0)),gx1=Math.max(...grp.map(c=>c.x1)),gy0=Math.min(...grp.map(c=>c.y0)),gy1=Math.max(...grp.map(c=>c.y1));
+  const bw=gx1-gx0+1,bh=gy1-gy0+1,ids=new Set(grp.map(c=>c.id)),mask=new Float32Array(bw*bh),bgv=sF/nF,fgv=sB/nB,den=Math.max(1,bgv-fgv);
+  for(let y=gy0;y<=gy1;y++)for(let x=gx0;x<=gx1;x++){const i=y*W+x,l=lab[i];let near=ids.has(l);
+    for(let dy=-2;dy<=2&&!near;dy++){const yy=y+dy;if(yy<0||yy>=H)continue;for(let dx=-2;dx<=2;dx++){const xx=x+dx;if(xx>=0&&xx<W&&ids.has(lab[yy*W+xx])){near=true;break}}}
+    mask[(y-gy0)*bw+(x-gx0)]=(!near||(l&&!ids.has(l)))?0:Math.max(0,Math.min(1,(bgv-g[i])/den))}
+  const mc=document.createElement('canvas');mc.width=bw;mc.height=bh;const mg=mc.getContext('2d'),im=mg.createImageData(bw,bh);
+  for(let i=0;i<mask.length;i++){const v=255-mask[i]*255;im.data[i*4]=im.data[i*4+1]=im.data[i*4+2]=v;im.data[i*4+3]=255}
+  mg.putImageData(im,0,0);
+  const sc=64/bh,oc=document.createElement('canvas');oc.width=Math.round(bw*sc)+32;oc.height=96;
+  const og=oc.getContext('2d');og.fillStyle='#fff';og.fillRect(0,0,oc.width,oc.height);og.drawImage(mc,0,0,bw,bh,16,16,Math.round(bw*sc),64);
+  return{vec:blur3(resample(mask,bw,bh)),asp:bw/bh,ocr:oc}}
+
+// Templates: every rank drawn in many fonts, plus whatever you teach it.
+const LBL=[['A','A'],['2','2'],['3','3'],['4','4'],['5','5'],['6','6'],['7','7'],['8','8'],['9','9'],['10','10'],['J','10'],['Q','10'],['K','10']];
+const FONTS=['bold {s}px Arial','{s}px Arial','bold {s}px Helvetica','{s}px Helvetica','bold {s}px Georgia','{s}px Georgia','bold {s}px "Times New Roman"','{s}px "Times New Roman"','bold {s}px Verdana','bold {s}px "Trebuchet MS"','bold {s}px "Courier New"','bold {s}px sans-serif','{s}px serif','800 {s}px system-ui','500 {s}px system-ui','italic bold {s}px Arial'];
+let TPL=[],tplBuilt=false;
+function addTpl(r,vec,asp,learned){const b1=blur3(vec);TPL.push({r,v1:norm(vec),v2:norm(b1),v3:norm(blur3(blur3(b1))),asp,learned})}
+function buildTpl(){
+  if(tplBuilt)return;tplBuilt=true;
+  const c=document.createElement('canvas');c.width=230;c.height=170;const g=c.getContext('2d',{willReadFrequently:true});
+  FONTS.forEach(f=>LBL.forEach(([txt,r])=>{
+    g.fillStyle='#fff';g.fillRect(0,0,230,170);g.fillStyle='#222';g.font=f.replace('{s}','100');g.textBaseline='top';g.fillText(txt,60,28);
+    const gl=glyphFrom(c);if(gl)addTpl(r,gl.vec,gl.asp,0)}));
+  try{JSON.parse(localStorage.getItem('bh_tpl')||'[]').forEach(t=>addTpl(t.r,Float32Array.from(t.v),t.asp,1))}catch(_){}}
+function learn(vec,asp,r){
+  if(!vec)return;addTpl(r,vec,asp,1);
+  try{const L=JSON.parse(localStorage.getItem('bh_tpl')||'[]');L.push({r,v:Array.from(vec,x=>+x.toFixed(3)),asp});
+    const cnt={},out=[];for(let i=L.length-1;i>=0;i--){cnt[L[i].r]=(cnt[L[i].r]||0)+1;if(cnt[L[i].r]<=8)out.unshift(L[i])}
+    localStorage.setItem('bh_tpl',JSON.stringify(out))}catch(_){}}
+function classify(vec,asp){
+  const q=norm(vec),best={};
+  TPL.forEach(t=>{let s=Math.max(dot(q,t.v1),dot(q,t.v2),dot(q,t.v3))-0.18*Math.abs(Math.log(asp/t.asp));if(t.learned)s+=0.05;if(!(t.r in best)||s>best[t.r])best[t.r]=s});
+  return Object.entries(best).sort((a,b)=>b[1]-a[1])}
+
+function regionCanvas(b,sc){
   const sx=b.x/sc,sy=b.y/sc,sw=b.w/sc,sh=b.h/sc;
-  const x0=sx+sw*0.18,y0=sy+sh*0.10,cw=sw*0.64,ch=sh*0.46,k=Math.max(1,110/ch);
-  const oc=document.createElement('canvas');oc.width=Math.round(cw*k)+40;oc.height=Math.round(ch*k)+40;
+  const x0=sx+sw*0.05,y0=sy+sh*0.03,cw=sw*0.90,ch=sh*0.58,k=Math.min(6,Math.max(1,150/ch));
+  const oc=document.createElement('canvas');oc.width=Math.max(8,Math.round(cw*k));oc.height=Math.max(8,Math.round(ch*k));
   const o=oc.getContext('2d',{willReadFrequently:true});o.fillStyle='#fff';o.fillRect(0,0,oc.width,oc.height);
-  o.filter=filt();o.drawImage(vid,x0,y0,cw,ch,20,20,oc.width-40,oc.height-40);o.filter='none';
-  const im=o.getImageData(0,0,oc.width,oc.height),p=im.data;
-  for(let i=0;i<p.length;i+=4){const v=(p[i]*3+p[i+1]*6+p[i+2])/10<150?0:255;p[i]=p[i+1]=p[i+2]=v}
-  o.putImageData(im,0,0);
-  const r=await worker.recognize(oc);return{rank:parseRank(r.data.text),conf:r.data.confidence||0,th:oc}}
+  o.imageSmoothingQuality='high';o.drawImage(vid,x0,y0,cw,ch,0,0,oc.width,oc.height);return oc}
+async function readRank(b,sc){
+  const rc=regionCanvas(b,sc),g=glyphFrom(rc);
+  if(!g)return{rank:null,conf:0,th:rc,vec:null,asp:1};
+  const L=classify(g.vec,g.asp),r1=L[0][0],s1=L[0][1],s2=L[1]?L[1][1]:-1;
+  let rank=null,conf=s1;
+  if(s1>=0.72&&s1-s2>=0.08)rank=r1;
+  else{
+    let o=null;if(worker){try{o=parseRank((await worker.recognize(g.ocr)).data.text)}catch(_){}}
+    if(o&&L.slice(0,3).some(x=>x[0]===o)){rank=o;conf=Math.max(s1,.72)}
+    else if((s1>=0.6&&s1-s2>=0.04)||(s1>=0.45&&s1-s2>=0.2))rank=r1}
+  return{rank,conf,th:g.ocr,vec:g.vec,asp:g.asp}}
 
 function showRV(items){
-  const k=items.map(x=>x.key+':'+x.r+':'+(x.conf/10|0)).join('|');if(k===rvKey)return;rvKey=k;
+  const k=items.map(x=>x.key+':'+x.r+':'+Math.round(x.conf*10)).join('|');if(k===rvKey)return;rvKey=k;
   const box=$('rv');box.innerHTML='';
-  items.forEach(x=>{const d=document.createElement('div');d.className='rc'+(x.r?'':' bad');
-    const c=document.createElement('canvas');c.width=60;c.height=Math.round(60*x.th.height/x.th.width)||40;c.getContext('2d').drawImage(x.th,0,0,c.width,c.height);
+  items.forEach(x=>{const d=document.createElement('div');d.className='rc'+(x.r&&x.conf>=.7?'':' bad');
+    const c=document.createElement('canvas');c.width=64;c.height=Math.round(64*x.th.height/x.th.width)||40;c.getContext('2d').drawImage(x.th,0,0,c.width,c.height);
     const sel=document.createElement('select');sel.setAttribute('aria-label','Correct this card');sel.innerHTML='<option value="">?</option>'+R.map(r=>`<option${x.r===r?' selected':''}>${r}</option>`).join('');
-    sel.onchange=()=>{if(sel.value)ov[x.key]=sel.value;else delete ov[x.key];lastSig='';cnt=0;rvKey=''};
-    const l=document.createElement('small');l.textContent=(x.key[0]==='D'?'Dealer':'You')+' · '+Math.round(x.conf)+'%';
+    sel.onchange=()=>{if(sel.value){ov[x.key]=sel.value;learn(x.vec,x.asp,sel.value)}else delete ov[x.key];lastSig='';cnt=0;rvKey=''};
+    const l=document.createElement('small');l.textContent=(x.key[0]==='D'?'Dealer':'You')+' · '+Math.round(Math.max(0,x.conf)*100)+'%';
     d.append(c,l,sel);box.appendChild(d)})}
 function applyRead(D,Pl){
   if(D.length<2)settled=false;
   if(!D.length&&!Pl.length){ov={};$('rv').innerHTML='';rvKey='';me=[];dealer=null;render();rdg('Waiting for a new hand…');return}
-  if(D.includes(null)||Pl.includes(null)){rdg('Can’t read a card clearly. Make the game bigger on screen, or use the manual backup.');return}
+  if(D.includes(null)||Pl.includes(null)){
+    const bad=D.map((r,i)=>r?'':'dealer card '+(i+1)).concat(Pl.map((r,i)=>r?'':'your card '+(i+1))).filter(Boolean);
+    rdg('Not sure about '+bad.join(' and ')+'. Pick it in the list under the buttons. It learns from your fix.');return}
   if(D.length>=2){
     const dt=tot(D),pt=tot(Pl),pbj=Pl.length===2&&pt.t===21,dbj=D.length===2&&dt.t===21;
     const win=Pl.length>=2&&pt.t<=21&&(dt.t>21||pt.t>dt.t||(pbj&&!dbj)),push=Pl.length>=2&&pt.t<=21&&!win&&pt.t===dt.t;
@@ -406,16 +515,18 @@ function applyRead(D,Pl){
   rdg(`Reading: Dealer ${D[0]||'?'} · You ${Pl.join(', ')||'?'}`)}
 
 async function scan(){
-  if(busy||!auto||!worker||!vid.srcObject)return;busy=true;
+  if(busy||!auto||!vid.srcObject)return;busy=true;
   try{
     const f=findCards();if(!f){busy=false;return}
     $('zD').classList.toggle('ok',f.dealer.length>0);$('zP').classList.toggle('ok',f.player.length>0);
     const now=f.dealer.length+f.player.length;if(now<prevCnt)ov={};prevCnt=now;
-    const rd=async(l,side)=>{const out=[];for(let i=0;i<l.length;i++){const x=await readRank(l[i],f.s),key=side+i;out.push({r:ov[key]||(x.conf>=55?x.rank:null),conf:x.conf,key,th:x.th})}return out};
+    if(!now){applyRead([],[]);busy=false;return}
+    const rd=async(l,side)=>{const out=[];for(let i=0;i<l.length;i++){const x=await readRank(l[i],f.s),key=side+i;out.push({r:ov[key]||x.rank,conf:ov[key]?1:x.conf,key,th:x.th,vec:x.vec,asp:x.asp})}return out};
     const DD=await rd(f.dealer,'D'),PP=await rd(f.player,'P'),D=DD.map(x=>x.r),Pl=PP.map(x=>x.r),sig=D.join()+'|'+Pl.join();
     showRV(DD.concat(PP));
     if(sig===lastSig)cnt++;else{lastSig=sig;cnt=1}
     if(cnt===2)applyRead(D,Pl);
+    const minH=Math.min(...f.dealer.concat(f.player).map(b=>b.h/f.s));$('szwarn').textContent=minH<70?'Cards look small ('+Math.round(minH)+'px). Move the camera closer or zoom in so they fill more of the preview.':'';
   }catch(e){rdg('Reading hiccup, retrying…')}
   busy=false}
 
@@ -429,7 +540,7 @@ async function scan(){
   let last=0;(function loop(t){if(!document.hidden&&t-last>45){draw();last=t}requestAnimationFrame(loop)})(0)})();
 
 // ===== What to tap =====
-function setPad(a){document.querySelectorAll('.pb').forEach(e=>e.classList.toggle('rec',e.dataset.a===a));$('pad').classList.toggle('has',!!a&&a!=='BUST')}
+function setPad(a,alt){document.querySelectorAll('.pb').forEach(e=>{e.classList.toggle('rec',e.dataset.a===a);e.classList.toggle('alt',!!alt&&e.dataset.a===alt)});$('pad').classList.toggle('has',!!a)}
 
 // ===== Camera: image + hardware controls =====
 function filt(){return `brightness(${$('br').value}) contrast(${$('ct').value})`}
